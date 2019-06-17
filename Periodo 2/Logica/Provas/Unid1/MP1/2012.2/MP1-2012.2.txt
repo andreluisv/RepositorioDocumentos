@@ -1,0 +1,27 @@
+1 Consistência de Conjuntos (0.5)
+a) Qual a definicao de consistência? 
+R: Um conjunto de sentenças é dito inconsistente se ele contém uma contradição, seja ela explícita ou não. Um conjunto de sentenças é dito consistente se ele não for inconsistente, ou seja, se ele não contém contradição.
+
+
+b) Considere o seguinte conjunto de sentencas:
+“Nenhum A é B. 
+Algum B é C. 
+Todo C é A”
+Este conjunto é consistente? Por quê? (0.2)
+R: Não é consistente. Se algum B é C, e todo C é A, então algum B é A. Entretanto na primeira premissa temos que nenhum A é B, o que contradiz a conclusão anterior (algum B é A). Tendo esta contradição implícita, o conjunto não é consistente.
+
+c) Seria consistente se a ultima sentenca do conjunto fosse alterada para
+“Todo A é C”? Justifique. (0.2)
+Explicação na imagem.
+
+
+2 Argumentos e Validez (0.5)
+a) O que é um argumento? (0.1), 
+R: Uma sequência de sentenças, a última das quais sendo a conclusão, e as anteriores sendo as premissas.
+
+b) O que é um argumento válido? (0.2)
+R: Um argumento é dito válido quando toda vez que suas premissas são verdadeiras a conclusão é verdadeira.
+
+c) Considere um argumento A formado por um conjunto P de premissas e um conjunto unitário C de conclusões. Sabe-se que eh possıvel que as sentencas de P sejam todas verdadeiras ao mesmo tempo e que o conjunto P ∪ C é inconsistente. Pode-se afirmar algo sobre a validez de A? Se sim, qual a afirmacao? Justifique. 
+R: Primeiro deve-se tomar cuidado com o conceito de consistência, caso haja uma interpretação em que o conjunto todo (premissas U conclusao) não apresente contradições, o conjunto se torna consistente.
+Como P U C é inconsistente, mas todas as premissas podem ser verdadeiras ao mesmo tempo (ou seja, existe pelo menos uma interpretação onde as premissas não apresentem contradição entre si), a contradição em A é entre a conclusão C e alguma(s) premissa(s) em P. Devido a isto o argumento A não pode ser válido, pois quando todas as premissas são verdadeiras, a conclusão não é. A pode ser no máximo válido POR VACUIDADE, caso as premissas não sejam verdadeiras ao mesmo tempo.
