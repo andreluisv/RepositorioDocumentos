@@ -1,0 +1,52 @@
+2º Exercício Escolar - by rngs
+
+1) Independência de dispositivo tem como objetivo trabalhar sobre um dispositivo de E/S sem necessariamente ter-se
+um conhecimento prévio dele. Consiste em criar um interface uniforme para isso, com utilização de armazenamento em
+buffer, relatório de erros(os quais serão tratados em níveis mais baixos), alocação e liberação de dispositivos
+dedicados, fornecimento do tamanho do bloco independente do dispositivo.
+
+2) Middleware é um conjunto reusável e extensível de serviçoes e funções que se fazem necessárias por parte de várias
+aplicações distribuídas para que elas funcionem bem em um ambiente de rede.É o responsável pela iteração entre o OS da
+máquina e as aplicações distribuídas. 
+Em sistemas heterogênios, que são fracamente acoplados, existe a possibilidade de se comunicarem multi-computadores com
+SOs distintos para isso o Middleware usa APIs para dar suporte à portabilidade e uso de protocolos comums para o suporte
+da interoperabilidade!
+
+3) Transparência de localização é um serviço do Middleware para garantir que o Cliente, usuário das requisições, não 
+tenha conhecimento da localização dos recursos que ele requisita ou o seu processo é executado(por exemplo). O serviço 
+de nome que dá suporte a este tipo de transparência é dado pelos Servidores de Nomes. Os Servidores de Nomes são 
+responsáveis pelo mapeamento dos nomes endereçados dessa forma a requisição de um nome é à esses servidores, de forma 
+iterativa ou recursiva, dependendo da implementação e o mesmo retorna o endereço sem o conhecimento por parte do Cliente disto.
+
+4) Transparência de acesso é quando o Cliente faz uma requisição de um dado, recurso ou dispositivo à aplicação distribuída
+sem que ele tenho o conhecimento que esses serviços podem ser acessados em sua própria cpu(local) ou é um serviço que está
+em outra cpu(remoto).
+Desenho tu se vira xD!
+
+A interação do RPC entre o cliente e o servidor é feita usando o protocolo Request-Reply e tem como objetivo programar um 
+sistema distribuido como se ele fosse centralizado.
+Para isso sao usados "stubs", pedacos de codigo que sao inseridos nas mensagens e servem para para tratar algumas 
+excecoes, fazer o marshalling e unmarshalling (empacotamento e desempacotamento) de dados.
+
+Inicialmente, o stub do cliente faz o marshalling e envia uma request ao servidor. O stub do servidor faz um 
+unmarshalling e chama o procedimento do servidor. Quando ele obtem o resultado, eh feito o marshalling e enviado um 
+reply para o cliente, cujo stub recebe os dados, faz o unmarshalling e repassa o resultado para o cliente.
+
+Desse modo, uma chamada de procedimento torna-se transparente para o cliente, ja que ele faz sempre da mesma maneira e 
+o stub fica responsavel por todo o trabalho de localizacao e envio da mensagem.
+
+5)Serviços oferecidos pelos Middleware são muitos, dentre eles podemos citar:
+- Facilidades de comunicação de alto nível: para esconder o baixo
+nível da passagem de mensagem através da rede e implementar ->transparência de acesso
+- Serviços de nomes: para implementar transparência de localização
+- Persistência: através de um sistema de arquivo distribuído
+- Transações distribuídas
+- Segurança
+Servicos de eventos sao esses servicos do middleware que sao usados por aplicacoes. A comunicacao entre as aplicacoes e 
+o middlware é feita atraves de uma API, no casa de java é o JavaRMI. A aplicacao consumidora faz uma solicitacao ao middleware. 
+Ele, entao, é responsavel por enviar a solicitacao para a aplicacao produtora para que seja executada determinada funcao. 
+Quando esta de posse do resultado, o middleware o envia para a aplicacao consumidora.A API é o javaRMI que permite
+chamadas de execução remota estilo RPC, ela fornece ferramentas para que seja possível ao programador desenvolver uma aplicação 
+sem se preocupar com detalhes de comunicação entre os diversos possíveis elementos (hosts) de um sistema.
+Figura do slide 55!
+http://cin.ufpe.br/~cagf/if677/2012-1/23-28_SD-Conceitos+Arquiteturas+Infras.pptx.pdf

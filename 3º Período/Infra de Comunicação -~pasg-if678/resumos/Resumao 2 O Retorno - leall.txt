@@ -1,0 +1,783 @@
+-=-=-=-=Camada de Rede=-=-=-=-
+
+Me Segue DaQui
+
+me      (Mensagem)    aplicação
+segue   (Seguimento)  transporte
+da      (Datagrama)   rede
+qui     (Quadro)      enlace
+        (Bits)        física
+
+Fornece a comunicação lógica entre HOSTS ( diferente da comunicação lógica entre PROCESSOS provida pela camada de transporte ). Os protocolos da camada de rede são implementados em hosts e em roteadores. Principais funções repasse e roteamento.
+
+- o papel fundamental dos roteadores é repassar datagramas de enlaces de entrada para enlaces de saída.
+
+<importante>
+
+repasse - envolve a transferência de pacotes de uma interface de um enlace de entrada para uma interface de enlace de saída ( em um ÚNICO ROTEADOR ). ( AÇÃO LOCAL )
+(Quando um pacote chega ao enlace de entrada de um roteador, esse deve conduzí-lo ao enlace de saída apropriado)
+
+roteamento - envolve TODOS os roteadores de uma rede cujas interações coletivas por meio do protocolo de roteamento determinam as rotas ( ou  caminhos ) que os pacotes percorrem em sua viajem do nó de origem ao nó de destino. Essas rotas são determinadas a partir de algoritmos de roteamento.
+
+algoritmos de roteamento podem ser:
+
+- centralizados - Com um algoritmo que roda em um local central e descarrega insformações de roteamento a cada um dos reoteadores.
+
+- descentralizados - Com um pedaço do algoritmo de rotemaneto distribuido funcionando em cada roteador.
+
+</importante>
+
+- cada roteador tem uma tabela de repasse, ele repassa um pacote examinando um campo do cabeçalho do pacote e indexando sua tabela de repasse. O resultado da tabela de repasse indica para qual enlace o roteador deve ser repassado. ( dependendo do protocolo esse campo pode ser um endereço, uma indicação, um id etc.). Note que o algoritmo de roteamento determina os valores que são inseridos nas tabelas de repasse dos roteadores.
+
+<importante>
+Comutadores de pacotes - designação para um dispositivo geral que repassa um pacote de uma interface de enlace de entrada para uma interface de enlace de saída de acorodo com um campo do cabeçalho.
+
+Comutador de camada de enlace - baseiam a decisão de repasse de acordo com um campo que se encontra no cabeçalho da camada de enlace.
+
+roteadores - baseiam sua decisão de repasse de acordo com campos que se encontram no cabeçalho da camada de rede.
+</importante>
+
+Modelo de serviço de rede - define características do transporte de dados fim-a-fim, entre uma borda da rede e a outra, isto é , entre sistemas finais remetente e destinatário.
+
+O modelo de Serviço da camada de Rede da Internet é o serviço de Melhor esforço.
+
+ 					      _ sem apresentação preliminar.
+                                             |  
+Serviços da Camada de Rede - Orientados e Não Orientados a conexão.
+                                |_ apresentação preliminar
+
+- semelhantes aos providos pela camada de Transporte, porém com algumas diferenças, são essas :
+
+-> Na camada de transporte esses serviços são serviços de processo a processo providos a camada de aplicação. Já na camada de rede são serviços host a host providos a camada de transporte.
+
+-> Em todas as arquiteturas de rede existentes até o momento fornecem um serviço ou orientado ou não orientado.(não ambos)
+-> Redes de Circuito Virtual - são redes que usam o serviço orientado a conexão da camada de rede.
+-> Redes de Datagramas - são redes que NÃO usam o serviço orientado a conexão provido pela camada de REDE.
+
+->Os serviços de conexão da camada de transporte são implementados nas bordas da rede(hosts) já os de camada de rede são implementados tanto nas bordas quanto nos roteadores.(roteadores devem guardar estados de conexão)
+
+
+
+-=-=-=-= Redes de Circuitos Virtuais =-=-=-=-=-
+-> Em redes de circuitos virtuais estabelecem-se caminhos entre os hosts ,  numeram-se os enlaces, criam-se numeros de CVs (CV ID) e salvam-se as informações em tabelas.
+-> Cada enlace pode escolher um numero de CV, pois se não ocorresse o overhead de processamento seria melhor iria demorar para estabelecer conexão visto que teríamos que checar em cada roteador até escolher um CV adequado para nossa comunicação.
+
+
+Fases de um Circuito Virtual:
+
+-> Estabelecimento de CV - a camada de transporte do remetente contata a camada de rede especificando o endereço do destinatário a camada de rede então cria um novo CV e a cada roteador que passa pelo CV vai criando um novo CVID e atualizando as tabelas de repasse dos roteadores. (durante o estabelecimento do CV a camada de rede pode alocar recursos como largura de banda).
+->Transferência de dados - depois de estabelecido o CV podemos transmitir pacotes através dele. (OBA!)
+->Encerramento do CV - quando um remetente ou destinatário deseja fechar conexão , a camada de rede informa ao seu comunicante e atualiza as tabelas de repasse de cara roteador que passa indicando que o CV não existe mais.
+
+
+-> As mensagens que os end systems enviam para estabelecer ou encerrar conexão, bem como as mensagens trocadas entre roteadores para modificar as tabelas de repasse, são chamadas mensagens de Sinalização.
+
+
+
+-=-=-=-= Redes de Datagramas =-=-=-=-=-
+
+->NÃO MANTÉM ESTADOS DE CONEXÃO!
+->NÃO HÁ ESTABELECIMNENTO DE CV. (NÃO EXISTE CV AQUI!!)
+
+-> a camada de rede coloca o endereço do destinatário no pacote e joga o pacote na rede. 
+-> os roteadores comparam prefixos, o enlace que bater com o profixo mais longo é para onde o pacote seguirá.(regra da concordância do profixo mais longo)
+-> a maioria dos endereços são contiguos, quanto menor o nível de contiguidade maior a tabela de repasse.
+-> como as tabelas de repasse podem ser modificadas a qualquer momento, uma série de pacotes enviados de um sistema final a outro podem seguir caminhos diferentes e chegar fora de ordem.
+
+
+-=-=-=-= Estrutura de um Roteador =-=-=-=-
+
+Componentes de um Roteador
+
+-=- Portas de Entrada -=- 
+
+
+->Terminação de Linha - termina um enlace físico de entrada em um roteador. (Função na camada Física)
+->Processamento de Enlace.(Função na camada de enlace)
+
+-> O módulo da Porta de Entrada responsável por examinar/repassar é fundamental para a função de repasse do roteador, em muitos roteadores é nele que é tomada a decisão de para que porta de saída o pacote deve ser encaminhado através do elemento de comutação. A informação contida na tabela de repasse é essencial para a escolha da porta de saída. Embora a tabela de repasse seja processada no processador de roteamento, comumente uma cópia é guardada em cada porta de entrada e atualizada quando necessário pelo processador. Essas cópias tornam as decisões de repasse mais rápidas e descentralizadas(repasse descentralizado) evitando um gargalo de processamento pois de outra forma seria necessário acessar o processador toda vez que um pacote chegasse. Porém em roteadores com baixa capacidade de roteamento na porta de entrada é necessário o encaminhamento do pacote para o processador de roteamento de forma que o mesmo possa escolher o enlace de saída.(esse caso é mais comum quando servidores são utilizados como roteadores). 
+ Com uma tabela de repasse o encaminhamento é "simples" basta fazer a checagem e procurar pelo maior prefixo que seja compatível com o pacote. Porém existe um fator de complicação: Os roteadores de backbone devem operar a uma taxa de milhões de checagens por segundo. É desejável que o processamento de porta de entrada ocorra em VELOCIDADE DE LINHA.
+<Importante>
+-> Dizemos que uma porta de entrada faz processamento em velocidade de linha quando é capaz de determinar o enlace de saída - através da tabela de repasse - em um tempo inferior ao tempo que um pacote leva para chegar por completo na porta de entrada. Nesse caso o processamento de um pacote recebido pode ser concluído antes que o próximo pacote seja recebido por completo.
+</Importante>
+
+->A busca na tabela de repasse geralmente (Devido a enlaces cada vez mais rápidos) é auxiliada pelo fato de guardar os dados da tabela em estruturas de dados que tornem a buscas eficientes como por exemplo árvores. Porém atualmente estruturas como árvores já não dão conta, então desemvolvem-se técnicas para aumentar a velocidade das consultas(Memórias de Conteúdo Endereçável e fazer caches de conteúdos recentemente utilizados).
+
+-=- Elemento de Comutação ("Uma rede dentro de um roteador de Rede!"Kurose) -=-
+
+-> É através dele que os pacotes são comutados i.e. são repassados de uma porta de entrada para a porta de saída.
+-> Diversas maneiras de se fazer a comutação.
+
+-> Comutação por memória - Lembra computadores com multiprocessadores com memória compartilhada. Quando umpacote chega na porta de entrada lança uma interrupção para o processador a fim de ser copiado para a memória. Quando copiado na memória espera para ser processado e após ser processado e procurado na tabela de repasse é encaminhado para o buffer da porta de saída correspondente. Em roteadores atuais as funções de consulta de endereço de destino e escrita na posição adequada da memória são realizadas por processadores nas portas de linha de entrada.
+
+-> Comutação por um Barramento - As portas de entrada e de saída estão diretamente ligadas por um barramento, e os pacotes segeum através dele sem a intervenção do processador de roteamento. O processador não se encarrega da transferência porque pelo barramento só pode passar um pacote de cada vez, então aqueles pacotes que devem ser enviados mas não podem no momento- pois outro pacote já esta utilizando o barramento - ficam em filas de entrada. Como apenas um pacote pode utilizar o barramento por vez a velocidade de roteamento é limitada pela velocidade do barramento.
+
+
+-> Comutação por uma rede de interconexão - Consiste em um número par de barramentos (2n) esses barramentos conectam n portas de entrada a n portas de saída. É uma malha de barramentos podendo formar aproximadamente 3^n combinações de barrramentos. Portanto se um barramento estiver ocupado pode-se escolher outro para passar o pacote.
+
+-=- Portas de Saída -=- 
+-> toma elementos que foram colocados na fila da porta de saída e os transfere através do enlace de saída.
+
+
+
+-=-=-= Formação de Fila =-=-=-
+
+- Filas de pacotes podem se formar tanto nas portas de entrada quanto nas portas de saída e a medida que essas filas crescem pode ocorrer perdas de pacotes (Sabemos agora em que parte do roteador os pacotes eram perdidos).
+
+- Se a taxa do elemento de comutação (taxa com a qual o elemento de comutação encaminha pacotes das portas de entrada para as de saída) for no mínimo n, e tivermos n portas de entrada e saída não ocorrerá formação de fila nas portas de entrada. Porém nesse caso pode ocorrer formação de fila na porta de saída, se por exemplo todos os pacotes forem encaminhados para uma mesma porta de saída, já que a porta de saída só pode transmitir um pacote por vez. Com a formação de fila na porta de saída temos a necessidade de escolher qual pacote da fila deve ser transmitido (necessita-se de um escalonador de pacotes). A decisão de qual pacote será transmitido pode ser feito de forma justa e simples FIFO, ou através de filas com prioridades. O escalonamento de pacotes é crucial para o fornecimento de qualidade de serviço (QoS).
+
+- Caso um pacote chegue e não tenha mais lugar na fila ele pode ser descartado imediatamente (Descarte de fim de fila) ou escolher um ou mais pacotes para serem descartados a fim de liberar lugar para o pacote recém chegado. As vezes é vantajoso descartar um pacote antes mesmo do buffer ficar lotado com o objetivo de sinalizar congestionamento ao remetente{existem várias políticas de descarte de pacotes [gerenciamento ativo de fila (active queue management - AQM)] }. Um dos algoritmos AQM é o de detecção aleatória rápida (Random Early Detection - RED).
+
+- Se o elemento de comutação não for suficientemente veloz comparado a taxa do enlace podem ocorrer filas nas portas de entrada pois os pacotes esperarão para serem transmitidos através do elemento de comutação.
+
+<Importante>
+-> Bloqueio de cabeça de fila (Head of Line blocking - HOL blocking) - quando um pacote que está no começo da fila faz pacotes que estão atrás dele na fila esperarem pois o barramento para a porta de saída do primeiro está sendo utilizado por outro pacote. (note que os pacotes que estão atrás na fila poderiam seguir para outra porta de saída mas são bloqueados pelo "egoísta")
+</Importante>
+
+
+
+-=-=-=-=-=-=-= Protocolo IP =-=-=-=-=-=-=-=-
+
+                      -> Formato do Datagrama IPv4<-
+
+                                 32 bits
+___________________________________|______________________________________________________
+|                                                                                        |
+__________________________________________________________________________________________
+| Versão | Comp. Cabeçalho | Tipo de Serviço |         Comprimento do Datagrama          |
+__________________________________________________________________________________________
+| Identificador de 16 bits                   | Flags | Desloc. de fragmentação 13bits    |
+__________________________________________________________________________________________
+| Tempo de vida | Protocolo da camada Super. |             CheckSum                      |
+__________________________________________________________________________________________
+|                                  Endereço IP 32bits Fonte                              |
+__________________________________________________________________________________________
+|                                  Endereço IP 32bits Destino                            |
+__________________________________________________________________________________________
+|                                  Opções (Se houver)                                    |
+__________________________________________________________________________________________
+|                                        Dados                                           |
+__________________________________________________________________________________________
+
+Versão -> Quatro bits que identificam a versão do protocolo que está sendo utilizada. De acordo com a versão do IP os roteadores interpretam os datagramas de formas diferentes.
+
+Comprimento do Cabeçalho -> Datagramas IPv4 podem conter um número variável de opções é necessário então saber o quão grande é o campo de opções a fim de determinar onde realmente começam os dados. Na maior parte dos casos o campo de opções não é utilizado (o cabeçalho fica com 20bytes).
+
+Tipo de Serviço -> Os bits para Tipo de Serviço foram incluídos para que fosse possível a diferenciação dos datagramas IP como por exemplo datagramas que carregam dados de tempo real e datagramas que  não  carregam dados de tempo real. É importante notar que dependendo do administrador do roteador determinados pacotes podem ter maior prioridade sobre outros.
+
+
+Comprimento do Datagrama -> É o comprimento total do datagrama IP (Cabeçalho + Dados) medido em bytes. Como esse campo tem 16bits podemos inferir que o tamanho máximo de um datagrama IP é 65535 bytes mas raramente os datagramas passam de 1500 bytes.
+
+<Importante>
+->o campo Comprimento do Datagrama (length) do cabeçalho IP indica o tamanho do datagrama por completo( INCLUINDO O CABEÇALHO !!! )
+</Importante>
+
+
+Identificador, Flags e Deslocamento de Fragmentação -> Relativos a fragmentação(Só o que o Livro fala).
+
+<Importante>
+-> Lembrar que o IPv6 não fragmenta datagramas.
+</Importante>
+
+
+Tempo de Vida (TTL) -> Incluído para garantir que datagramas não fiquem circulando para sempre na rede. O campo é decrementado a cada salto e quando seu valor é 0 o datagrama é descartado.
+
+Protocolo da Camada Superior -> Utilizado quando o datagrama chega ao seu destino final, com o objetivo de identificar o protocolo de transporte que deve ser usado para interpretar o conteúdo do datagrama(Semelhante às portas da camada transporte - aplicação).
+
+CheckSum -> Auxilia roteadores na detecção de erros. Checksum do IP checa apenas o cabeçalho enquanto que o do TCP checa tudo. O checksum deve ser recalculado em cada salto pois o TTL e alguns campos podem mudar a cada salto. Porque Checksum no TCP e no IP? -> O TCP pode rodar encima de outros protocolos de rede como ATM por exemplo logo é necessário fazer a checagem de erros na camada de transporte. o IP pode entregar seus dados a um protocolo diferente do TCP necessitando da checagem na camada de rede.
+
+
+
+Endereço Fonte/Destino -> Quando um datagrama IP é criado o host remetente coloca seu IP como endereço fonte e o do destinatário como destino - NOSSA! TU JURA? - (as vezes essa cunsulta é feita através de DNS). 
+
+ 
+Opções -> Permite que um cabeçalho IP seja ampliado. Note que fica difícil de saber onde começam os dados a priori (ainda bem que existe o campo de tamanho de cabeçalho!) e que datagramas IP podem ter atrasos de processamento variáveis. 
+
+
+Dados -> Geralmente contém segmentos da camada de transporte TCP/UDP mas em alguns casos podem carregar mensagens especiais como ICMP.
+
+
+-=-=-= Fragmentação do Datagrama IP =-=-=-
+
+-> Nem todos os protocolos da camada de enlace podem transportar pacotes do mesmo tamanho ( Alguns transportam pacotes grandes outros pacotes pequenos ). A quantidade máxima de dados que um quadro da camada de enlace é denominada unidade máxima de transmissão (maximum transmission unit - MTU). Como os datagramas IP são encapsulados dentro de quadros da camada de enlace , para serem transportados de um roteador até outro , a MTU especificada no protocolo da camada de enlace molda o tamanho do datagrama IP. 
+
+-> A tarefa de reunir os fragmentos para entregar para a camada de transporte é função dos end systems. Deve-se manter a simplicidade no núcleo da rede. 
+-> Existem campos no cabeçalho IP que auxiliam na reconstrução de datagramas fragmentados(indentificação, flag e deslocamento de fragmentação).
+-> Quando datagramas IP são criados, recebem numero de identificação que é incrementado para cada novo datagrama. Quando um datagrama necessita ser fragmentado seus fragmentos recebem o mesmo numero de identificação do datagrama original e seu deslocamento de fragmentação é setado de forma que seja possível identificar a posição do fragmento dentro do datagrama inteiro. Para que o host de destino saiba quando estiver recebendo o ultimo fragmento do datagrama (já que o IP não é confiável e pode perder o ultimo fragmento ) coloca-se a flag do ultimo datagrama setada para 0(enquanto que nos outros é 1). Caso seja perdido um fragmento do datagrama o datagrama será perdido.
+Se na camada de transporte estiver sendo utilizado o TCP será necessário retransmitir o pacote por completo, caso eteja utilizando UDP terá o pacote como perdido. 
+
+
+-=-=-=-= Endereçamento IPv4 =-=-=-=-
+
+<Importantíssimo>
+->Um endereço IP está associado a uma interface e NÃO a um end-system ou roteador.
+->Interface - A fronteira entre o hospedeiro e o enlace físico.
+Ex: um roteador possui no mínimo duas interfaces pois deve receber pacotes de um enlace e repassá-los para outro enlace.
+</Importantíssimo>
+
+
+-> Cada endereço IP tem 32 bits portanto existem 2^32 possíveis endereços IP. Esses endereços são escritos em notação decimal separada por pontos, na qual cada byte é escrito em sua forma decimal e separado por pontos dos outros bytes. 
+-> Cada interface deve ter um endereço IP globalmente exclusivo (exceção interfaces por trás de NATS).
+-> Parte do endereço IP é determinado pela subrede à qual a interface está conectada.
+-> Notações do tipo endereço/xx indicam que os xx primeiros bits do endereço definem a subrede. (máscara de subrede)
+-> Receita de bolo para encontrar subrede -> Para determinar as subredes, destaque cada interface de seu host ou roteador, criando ilhas de rede isoladas com interfaces fechando as terminações das redes isoladas. cada uma dessas redes isoladas é determinada sub-rede.
+-> A estratégia de atribuição de endereços da internet é conhecida como ROTEAMENTO INTERDOMÍNIO SEM CLASSES (CLASSELESS INTERDOMAIN ROUTING - CIDR) . O CIDR generaliza a noção de endereçamento de sub-rede. Como acontece com o endereçamento de sub-redes, o endereço IP de 32 bits é dividido em 2 partes e, novamente , tem a forma decimal com pontos de separação a.b.c.d/x onde x indica o número de bits existentes na primeira parte do endereço.Os x bits iniciais constituem a parcela de rede do endereço IP e normalmente são chamados de prefixo de rede (ou prefixo). Os bits restantes servem para identificar equipamentos e dispositivos dentro de uma organização por exemplo com o mesmo prefixo de rede.
+
+-> Antes do CIDR , os tamanhos das parcelas de um endereço IP estavam limitados a 8, 16 ou 24 bits uma esquema conhecido como endereçamento de classes cheias já que subredes com endereço 8,16 e 24 eram conhecidos como classes A, B e C respectivamente.
+
+-> Endereço de broadCast -> quando um host emite um datagrama com endereço de destino 255.255.255.255 a mensagem é entregue a todos os hosts da mesma subrede. 
+  
+-=-= Obtenção de blocos de endereço =-=-
+
+Obtenção de blocos de endereço -> Para Obter um bloco de endereços IP para utilizar dentro de uma sub-rede de uma organização um administrador de rede poderia contatar seu ISP que então forneceria endereços a partir de endereços maiores do ISP.
+
+exemplo: 
+
+O ISP possui o endereço IP:          202.9.72.32/27    =>    11001010 00001001 01001000 00100000 
+O ISP poderia reservar para essa organização os endereços do tipo 202.9.72.32/28 (11001010 00001001 01001000 0010  0000) -> a organização poderia endereçar 2^4 interfaces.
+Caso outra organização também solicitasse o ISP poderia reservar 202.9.72.48/28 (11001010 00001001 01001000 0011  0000) para outra organização.
+
+<Importante>
+No exemplo acima vimos que um ISP a partir de um prefixo de rede conseguiu espaço para duas organizações. Existe uma simplificação pois para a rede exterior deve-se enviar datagramas os quais os 27 primeiros bits sejam iguais ao do ISP. Essa capacidade de endereçar várias redes com um único prefixo de rede é chamada AGREGAÇÃO DE ENDEREÇOS, AGREGAÇÃO DE ROTAS OU RESUMO DE ROTAS.   
+</Importante>
+
+Caso uma organização queira mudar de ISP e permanecer com seu prefixo de rede deve-se adicionar o mesmo ao roteador do novo ISP, Assim o novo ISP pode repassar datagramas que cheguem para os endereços "comuns" dele ou para o endereço da organização.
+Onde os ISPs conseguem endereços? -> Existe uma organização que regula e administra endereços IP, além de regular servidores de nome raiz DNS. O nome dessa oorganização é Internet Corporation for Assigned Names and Numbers (ICANN).
+
+
+-=-= Obtenção de um endereço de Host =-=-
+
+- O endereço IP de um host pode ser designado de duas maneiras:
+
+Configuração Manual -> Um administrador configura manualmente o endereço IP do host.
+
+Protocolo de Configuração Dinâmica de Hospedeiros (Dynamic Host Configuration Protocol - DHCP) -> o DHCP permite que um host obtenha um endereço IP automaticamente, além de adquirir informações como máscara de sub-rede , endereço do roteador do primeiro salto (Default Gateway) e o endereço do Servidor DNS local. Por causa de sua capacidade de automatizar configurações de rede o protocolo DHCP é denominado um protocolo PLUG AND PLAY. A utilização do DHCP é de extrema importância atualmente principalmente com o advendo de internet sem fio e dispositivos móveis. O usuário que possui um dispositivo móvel e se conecta a diversas redes sem fio em diferentes momentos faz uso do DHCP, pois o mesmo só ficará conectado a uma rede por um curto período de tempo, ele recebe então um endereço IP Temporário. O DHCP pode ser configurado também para mapear um único endereço IP fixo.
+
+-=-= Tradução de Endereços na Rede (NAT) =-=-
+
+-> Criado para tentar contornar o esgotamento de endereços de rede.
+-> O roteador esconde a existência de uma rede.
+-> Mapeamento através de tabelas NAT que guardam IP e porta.
+-> Obtenção de eendereços através de DHCP(quase sempre).
+
+
+-> O roteador de saída da rede local tem um endereço IP visível ao resto da rede, hosts dentro dessa rede local enviam pacotes para o roteador de saída que então os abre e muda o endereço IP fonte e a Porta fonte, e faz um mapeamento em sua tabela NAT da nova porta com o endereço IP e porta do host. Quando um pacote chegar com aquela determinada porta será encaminhado para o host adequado.
+
+-> NAT e aplicações P2P -> essencialmente em aplicações P2P qualquer peer pode tentar abrir uma conexão TCP com outro peer, o problema é : se o peer servidor estiver atrás de um NAT como iniciar uma conexão? Ou configura-se o NAT de acordo com a aplicação P2P ou utiliza-se um intermediário que não está atrás de uma NAT e que o peer servidor tem uma conexão em curso. O peer que será o cleinte se comunica com o intermediário então solicita uma conexão ao servidor através do intermediário (EITA GAMBIARRA LINDA!).
+Essa ultima técnica é chamada de reversão de conexão. É importante observar que se ambos estiverem atrás de NATS (Bye Bye Beautiful!) não pode ocorrer uma conexão  (Já que servidores devem ter número de porta bem definidos).
+
+
+<Importantíssimo>
+--> Roteadores NAT ferem o princípio fim-a-fim -> Roteadores NAT devem atuar na camada de transporte também, pois necessitam alterar dados como por exemplo porta fonte.
+como o roteador estará atuando em camadas acima das que ele deve atuar fere-se o princípio fim-a-fim da camada de transpote.
+</Importantíssimo>
+
+<Vai que cai>
+-> O espaço de endereço 10.0.0.0/8 é uma das três porções do espaçode endereço IP reservado pelo [RFC 1918]  para uma rede privada ou um domínio com endereços privados. 
+um domínio com endereços privados refere-se a uma rede na qual os endereços só tem sentido para elementos dessa rede.
+</Vai que cai>
+
+
+-=-=-=-= Protocolo de Mensagens de Controle da Internet - ICMP =-=-=-=-=-
+
+
+-> Utilizado por Hosts e Roteadores para trocar informações da camada de rede entre si (Mais comum para erros).
+-> geralmente o ICMP é considerado parte do IP, mas na verdade ele está acima do IP visto que as mensagens do ICMP são carregadas no campo de dados do datagrama IP e quando um host desencapsula um datagrama IP e observa que os dados são ICMP demultiplexa de maneira semelhante a como faria com segmentos TCP e UDP.
+-> Mensagens ICMP tem um campo de tipo e um campo de Código além do cabeçalho e os  8 primeiros bytes do datagrama IP que causou a criação da mensagem. 
+
+Type Code description
+0 0 echo reply (ping)
+3 0 dest. network unreachable
+3 1 dest host unreachable
+3 2 dest protocol unreachable
+3 3 dest port unreachable
+3 6 dest network unknown
+3 7 dest host unknown
+4 0 source quench (congestion control - not used)
+8 0 echo request (ping)
+9 0 route advertisement
+10 0 router discovery
+11 0 TTL expired
+12 0 bad IP header
+
+
+-=-=-= IPv6 =-=-=-
+
+IPv4 acabando e agora? solução : IPv6
+
+-= Formato do datagrama IPv6 =-
+
+-> Capacidade de endereçamento expandida - expandiu-se a quantidade de bits necessária para representar um endereço, de 32 bits para 128 bits (cada grão de areia da terra pode ter um endereço IP!). Além dos endereços Multicast e unicast o IPv6 introduziu um novo tipo de endereço chamado anycast que permite que um datagrama seja enviado para qualquer host de um grupo.
+
+<Joke>
+
+(cada grão de areia da terra pode ter um endereço IP!)
+
+ _____________________________________________________________________________________________________________
+|MSN Messenger                                                                                           - o x|
+ _____________________________________________________________________________________________________________
+|  ___                                                                                                        |
+| | o |                                                                                                       |
+| |[|]|   Cal - Caio -     Enter Sandman - Metallica                                                          |
+|  ___                        										      |
+|                                                                                                             |
+|                                                                                                             |
+| - Amigos...                                                                                                 |
+|                                                                                                             |
+|    - Mulher de Areia -   Dust in the Wind - Scorpions                                                       |
+|    - G-r-Ã-0 -   Heroes of Sand - Angra     								      |
+|    - SiLício jr. - "Quando eu crescer eu quero ser honesto e transparente como o meu pai. - Virarei vidro". |
+|    - Mareia João - "Escrevi seu nome ... na areia."							      |
+|                                                                                                             |
+|_____________________________________________________________________________________________________________|
+
+
+</Joke>
+
+-> Cabeçalho aprimorado de 40 bytes - Cabeçalho fixo, com processamento rápido e uma nova codificação de opções. Alguns campos do IPv4 foram excluídos outros viraram opcionais. 
+
+-> Rotulação de fluxo e prioridade -> Diferenciação de tratamento para diferentes tipos de datagramas (datagramas tempo real levam vantagem sobre datagramas "normais"). 
+
+ 
+-= Cabeçalho IPv6 =-
+_________________________________________________________________________________
+|         Versão        |         Classe de tráfego           | Rótulo de fluxo |
+_________________________________________________________________________________
+|Comprimento. da carga útil |  Proximo Cabeçalho |      Limite de saltos        |
+_________________________________________________________________________________
+|                              Endereço da Fonte (128 bits)                     |
+_________________________________________________________________________________
+|                           Endereço do Destino (128 bits)                      |
+_________________________________________________________________________________
+|                                    DADOS                                      |
+_________________________________________________________________________________
+
+Versão - indica a versão do Protocolo IP utilizado. (note que se colocarmos 4 no campo versão não formará um datagrama IPv4 válido).
+
+Classe de Tráfego - Semelhante ao TOS do IPv4.
+
+Rótulo de fluxo - Identifica um fluxo de datagramas. (Embora o conceito de Fluxo não esteja claro na RFC).
+
+Comprimento da carga útil - Esse valor de 16 bits é tratado como um número inteiro sem sinal que representa o número de bytes do datagrama que vem logo após o cabeçalho.
+
+Próximo cabeçalho - Identifica qual o protocolo que o conteúdo do datagrama deve ser entregue (UDP,TCP etc.). Usa os mesmos valores do campo Protocolo do IPv4.
+
+Limite de saltos - Equivale ao TTL do IPv4.
+
+
+Quanto aos campos do IPv4 que não estão presentes no IPv6?
+
+Fragmentação / Remontagem - IPv6 não permite fragmentação! se um pacote for muito grande para ser repassado por um roteador o roteador o descarta e manda uma mensagem ICMP indicando que o pacote possui tamanho muito grande, cabe então ao host diminuir o tamanho do pacote. Operações de fragmentação e remontagem são custosas e retirar essa complexidade da rede acelera o repasse de datagramas.
+
+Checksum - como protocolos de camada de transporte e de camada de enlace fazem uso de checksum aplicar o mesmo na camada de rede sería redundância. além de que é custoso calcular checksum em todo roteador que passar(TTL).
+
+Opções - podemos colocar opções no IPv6 porém as mesmas serão incluídas como um próximo cabeçalho assim como os segmentos TCP e UDP. É importante deixar o cabeçalho de tamanho fixo!
+ 
+
+
+
+
+
+-=-=-= Transição IPv6 para IPv4 =-=-=-
+
+-> Deverá ocorrer uma transição gradual.
+-> Diversas técnicas para fazer a transição.
+
+-= Abordagem de pilha dupla -> Propõe-se que roteadores consigam lidar tanto com IPv6 quanto com IPv4 completo. Assim poderiam se comunicar tanto com IPv6 quanto com IPv4 Passando os dados de um datagrama IPv6 para um datagrama IPv4 poderia ocorrer perdas de campos como por exemplo campo de fluxo que não tem correspondente no IPv4.
+
+-= Tunelamento -> Quando 2 nós IPv6 estão separados por um túnel (Roteadores Ipv4) o datagrama IPv6 é colocado completamente no campo de dados de um datagrama IPv4. O nó destinatário saberá quando um datagrama IPv4 contém um IPv6.
+
+
+
+
+
+===================================================================
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-= CAMADA ENLACE =-=-=-=-=-=-=-=-=-=-=-=-=-
+
+-> tem como função principal transportar datagramas da camada de rede de um nó a outro do enlace.
+-> no caminho fim-a-fim um datagrama pode ser manipulado por vários protocolos de enlace (sendo que cada protocolo de enlace oferece serviços diferentes como por exemplo transporte confiável).
+
+
+-= Terminologia =-
+
+- Nó -> um host ou um roteador.
+- Enlace -> canal de comunicação que liga dois nós.
+
+-= Serviços fornecidos pela camada de enlace =-
+
+- O protocolo da camada de enlace define o formato dos pacotes trocados entre nós nas extremidades do enlace além das ações realizadas por esses nós ao receber/enviar o pacote.  
+
+-= Serviços Oferecidos Pela camada de enlace =-
+
+Serviço BASICÃO -> transportar datagramas nó a nó por um único enlace de comunicação.
+
+Enquadramento de dados -> Quase todos os protocolos da camada de enlace transportam os datagramas de rede encapsulados em quadros (quadro é um conjunto de dados que contém uma série de campos de cabeçalho) que são especificados pelo protocolo utilizado.
+
+Acesso ao enlace -> Um protocolo de controle de acesso ao meio ( Medium Access Control Protocol - MAC ) especifica as regras segundo as quais um quadro é transmitido pelo enlace. Quando em um enlace ponto-a-ponto só existe um remetente e um receptor protocolos MAC são simples ou inexistentes porém quando ocorre de vários nós compartilharem um enlace de broadcast deve-se tomar cuidado para que dados não sejam corrompidos por falta de sincronização.
+
+Entrega Confiável -> Importante para enlaces com altas taxas de erro como por exemplo enlaces sem fio (não guiados) onde tenta-se tratar o erro localmente em vez de retransmitir o pacote novamente o que poderia ocasionar grandes atrasos. Para enlaces de baixa taxa de erro, transferência confiável seria apenas sobrecarga portanto grande parte dos protocolos de camada de enlaces com fio (guiados) não utilizam Entrega confiável.
+
+Controle de fluxo -> Nós que ficam nas pontas do enlace geralmente possuem pouca memória temos pois que evitar que um nó remetente congestione um nó Receptor. 
+
+Detecção de Erros -> Detecção mais sofisticada que a da camada de rede e de transporte (Geralmente implementada em hardware). Nós transmissores enviam bits de detecção de erros.
+
+Correção de Erros -> Em alguns casos a detecção de erros é tão sofisticada que o nó é não só capaz de detectar como também capaz corrigir. 
+
+Half Duplex e Full Duplex -> com full duplex um nó pode receber e transmitir dados ao mesmo tempo (ambos os nós das extremidades do enlace podem enviar ao mesmo tempo), enquanto que com o half duplex isso não ocorre.
+
+
+-=-= Comunicação por Adaptadores =-=-
+
+-> Os protocolos da camada de enlace são, na maioria das vezes , implementados em adaptadores. Se um protocolo de enlace provê confiabilidade então temporizadores e etc deverão ser implementados no adaptador. Os adaptadores são chamados Cartões (Placas) de interface de rede ou Network Interface Cards (NICs).
+
+-> O adaptador é uma unidade semi-autônoma caso o adaptador receba um quadro corrompido detecta localmente e corrige ou descarta, sem usar o processador do nó. Quando um quadro chega em um adaptador é extraído o datagrama dele e então enviado para cima na camada de protocolos. Da mesma forma quando necessita-se enviar um datagrama a camada de cima delega total responsabilidade ao adaptador.
+
+-> Interface de barramento -> parte do adaptador responsável por se comunicar com o nó pai. Transfere dados e informações de controle ao nó pai.
+-> Interface de enlace -> Responsável pela implementação do protocolo da camada de enlace. montagem e desmontagem de quadros, detecção de erros entre outras funções da camada de enlace.  
+
+-=-= Técnicas de Detecção de Correção de Erros =-=-
+
+-> nessa seção considere dados como um conjunto geral de bits, e não como a parte de dados de determinado pacote.
+
+-= Verificação de Paridade =-
+
+-> Adiciona-se um bit de paridade a fim de fazer com que o número de 1s no quadro seja ímpar ou par dependendo do tipo de paridade escolhida. Para esse caso com um único bit de paridade só há detecção quando o erro altera um número ímpar de bits (1,3,5,7....). Se o for afetado um número par de bits o erro não será percebido. Na prática erros vem em rajadas e seria muito provável a ocorrência de erros desse ultimo tipo logo não podemos utilizar esse esquema na prática.  
+
+-> Pode-se usar esse esquema de forma bidimensional a fim de melhorar a sua taxa de acerto e pode-se até corrigir erros (EBA QUE LEGAL!). 
+
+
+
+-= Soma de Verificação - CheckSum - <joke> Daniel Sum </joke> =-
+
+-> Considera-se um conjunto de bits de dados como sendo sequencias de inteiros de k bits, soma-se todos os inteiros e faz-se complemento a 1 i.e. nega-se todos os bits. O resultado obtido é o campo de verificação. Para detectar o erro basta somar tudo inclusive a verificação e ver se o resultado possui apenas numeros 1 se possuir pode ser que esteja correto, se não concerteza está errado.
+
+-> utiliza-se geralmente soma de verificação a nível de camada de transporte (software) para evitar complexos algoritmos e demora para verificação (Simplicidade). Formas mais complexas de detecção de erros como por exemplo CRCs são utilizadas na camada de enlace pois podem ser executadas velozmente através de hardware.
+
+
+-= Verificação de Redundância Cíclica - Cyclic Redundancy Check (CRC) - Códigos Polinomiais =-
+
+-> Identifica-se a cadeia de bits como um polinômio de coeficientes 0 e 1. As operações na cadeia de bits são entendidas como operações polinomiais. Os nós comunicantes acordam um conjunto de r + 1 bits conhecido como gerador, onde r é o tamanho do campo de CRC. Coloquemos o bit mais significativo do gerador para 1 .O remetente escolherá um padrao de r bits CRC tal que dados + r seja divisível pelo gerador. Quando os dados chegam no receptor ocorre a divisão e se o resto form zero assume-se que não ocorreu erros, caso contrário assume-se que ocorreu erros. as operações de adição e subtração são apenas xors. o campo CRC é o resto da divisão de dados*2^r/gerador. (precisa shiftar para poder considerar o tamanho de dados grande o suficiente para acoplar R na soma e ficar mais simples)
+
+
+
+
+
+-=-=-=-=-=-=-= Protocolos de Acesso Múltiplo =-=-=-=-=-=-=-
+
+
+Enlace ponto-a-ponto -> Um único remetente em uma extremidade do enlace e um único receptor na outra extremidade.
+
+Enlace Broadcast -> Canal de comunicação que é compartilhado por vários nós, quando um nó envia um quadro todos recebem uma cópia do quadro. 
+
+
+Problema do acesso múltiplo -> como coordenar o acesso de vários nós a um canal broadcast compartilhado?
+
+Protocolos de Acesso Múltiplo -> são protocolos que regulam a transmissão em canais broadcast. Tenta-se evitar as colisões de dados causadas quando vários nós tentam transmitir ao mesmo tempo. Protocolos de acesso múltiplo são divididos em 3 categorias: protocolos de divisão de canal, protocolos de acesso aleatório e protocolos de revezamento.
+
+Um protocolo de acesso múltiplo ideal : 
+Suponha um canal broadcast de velocidade R bits/segundo.
+
+- Quando apenas um nó está transmitindo ele utiliza a vazão de Rbps.
+- Quando M nós estão transmitindo possuem uma vazão média de R/M bps.
+- Protocolo descentralizado onde não hajam nós mestres que possam derrubar o sistema inteiro.
+- Protocolo simples com implementação barata.
+
+
+
+-=-=-= Protocolos de Divisão de Canal =-=-=-
+
+Protocolo TDM -> Divide o tempo em quadros temporais e cada quadro temporal em compartimentos, cada compartimento carrega dados provenientes de um nó diferente. Parece bom já que todos os nós compartilham igualmente a banda no tempo porém se só existir um único nó transmitindo sua velocidade será a mesma que se N nós estivessem transmitindo R/N bps e ele deve esperar para transmitir (por isso sua vazão é baixa).
+
+Protocolo FDM -> Divide o canal em freqüencias e separa cada intervalo de freqüencia para um nó. Suponha que R bps seja a taxa do canal se quisermos acoplar N nós faremos uma divisão a fim de que cada nó receba R/N bps mas se nem todos os nós estiverem usando sua frequencia os outros não poderão utilizar mais banda e terão que se contentar com R/N bps (Assim como no TDM).
+
+Acesso Múltiplo por Divisão de Código - Code Division Multiple Access (CDMA) -> Nesse protocolo cada nó recebe um código e utiliza esse código para codificar os bits de dados que envia . Dependendo dos códigos escolhidos múltiplos nós podem transmitir ao mesmo tempo e os nós remetentes conseguirão decodificar (QUE DEMAIS!). O CDMA já vem sendo utilizado há algum tempo na área militar.
+
+
+-=-=-= Protocolos de Acesso Aleatório =-=-=-
+
+- Nesse tipo de protocolo um nó sempre transmite a taxa máxima do canal. Quando há colisão os nós envolvidos na colisão esperam um certo intervalo de tempo aleatório para poder enviar novamente. 
+
+-=-= Slotted Aloha =-=-
+
+
+-> Considere as seguintes propriedades . 
+
+  - Todos os quadros consistem em exatamente L bits.
+  - O tempo é dividido em intervalos de L/R segundos. (Tempo necessário para a transmissão de um quadro)
+  - Os nós começam a transmitir quadros apenas no início dos intervalos.
+  - Os nós são sincronizados de forma que cada nó sabe onde os intervalos começam.
+  - Se dois ou mais nós colidirem em um intervalo, então todos os nós detectarão a colisão antes do fim do intervalo.
+
+-> Quando um nó tem um quadro para enviar ele espera até o início do próximo intervalo para transmitir.
+-> Se não ocorreu colisão então o quadro foi transmitido com sucesso.
+-> Se ocorreu colisão os nós que estavam enviando detectarão antes do fim do intervalo, e esperar-se-á um certo intervalo de tempo aleatório para ocorrer a retransmissão. Esse passo é repetido até que o quadro seja transmitido com sucesso.
+
+=> É um protocolo altamente descentralizado onde cada nó detecta colisão e decide independentemente quando retransmitir.
+=> Diferentemente de protocolos de divisão de canal o Slotted Aloha permite utilização total da banda quando apenas um nó transmite.
+=> Funciona bem com um único nó mas e com vários?
+=> Haverá quantidade significante de desperdícios de intervalos quando vários nós transmitem, existirão intervalos onde ninguém transmite devido a uma colisão anterior e intervalos de colisão. Os unicos intervalos bem-sucedidos são aqueles em que um único nó transmite. A eficiência é medida pela fração de intervalos bem-sucedidos quando existe uma grande quantidade de nós querendo transmitir um grande número de quadros.
+
+
+Medindo a eficiência
+
+=> suponha a existência de N nós e que cada nó tem uma quantidade infinita de quadros para enviar.
+=> suponha que a probabilidade de um nó transmitir e/ou retransmitir é p.
+
+=> sabemos que para que um intervalo seja bem-sucedido apenas um nó deve estar transmitindo. A probabilidade de apenas um nó transmitir é a probabilidade de um nó transmitir multiplicado pela probabilidade de todos os outros nós não transmitirem. 
+=> p*(1-p)^(N-1)
+
+=> como existem N nós a probabilidade de um nó transmitir é => N*[p*(1-p)^(N-1)] 
+
+
+=> a eficiencia do slotted aloha quando N nós estão ativos é : N*[p*(1-p)^(N-1)] 
+=> para obter a eficiência máxima do slotted aloha temos que encontrar um p o qual maximize a equação.
+=> derivamos e igualamos a zero, procuramos o máximo da função.
+=> depois de fazer isso (faz de conta que eu fiz) o resultado da 1/e = 0,37.
+=> ou seja 37% (ECA!)=> a velocidade de transmissão se reduz a 0,37 Rbps.
+
+
+
+-=-= Aloha (WoOHOo Brou! MaHalo! Tcha Tcha Tcha! Hula Hula!) =-=-
+
+=> O Aloha não é sincronizado.
+=> Totalmente descentralizado.
+=> Assim que um datagrama chega para ser enviado ele monta o quadro e envia para rede broadcast.
+=> Se ocorrer colisão ele tem uma probabilidade p de reenviar e (1-p) de ficar esperando um tempo de transmissão de quadro.
+=> Tem-se uma probabilidade p de transmitir e (1-p) de não transmitir.
+=> para que um pacote seja transmitido com sucesso é necessário que ninguém esteja transmitindo no momento que um nó tenta transmitir. (1-p)^(N-1)
+=> é necessário também que durante o intervalo de tempo de transmissão de um quadro ninguém tente transmitir. (1-p)^(N-1)
+=> ou seja probabilidade de ninguém estar transmitindo e ninguém querer transmitir. (1-p)^[2*(N-1)]
+=> logo a probabilidade de sucesso é p*{(1-p)^[2*(N-1)]}
+=> N*p*{(1-p)^[2*(N-1)]}
+=> Derivando e igualando a zero (faz de conta que eu fiz e ainda refiz só para ter certeza do resultado) teremos p = 1/(2e) = 0,37/2 = 0,185
+=> Exatamente a metade da eficiencia do Slotted Aloha.
+=> é o que dá, não sincronizar.
+
+
+
+
+-=-= Carrier Sense Multiple Access - CSMA (Acesso Multiplo Com Detecção de Portadora) =-=-
+
+
+-> tanto no Aloha quanto no Slotted Aloha os nós não param de transmitir quando ocorre uma detecção de colisão nem checam para ver se o canal está sendo utilizado por outro nó.
+
+-> Detecção de Portadora -> Um nó escuta o canal a fim de detectar se o mesmo está sendo utilizado por outro nó. Se estiver sendo utilizado o nó que escutou aguarda um tempo aleatório e tenta escutar novamente até que o canal esteja livre para que possa ser utilizado.
+
+-> Detecção de Colisão -> Quando um nó que está transmitindo percebe que outro nó está a transmitir pára imediatamente e espera um tempo determinado para escutar o canal e tentar transmitir novamente.
+
+-> Se cada nó antes de transmitir escuta o canal como ocorrem colisões? no momento em que o nó escuta o canal parte dos dados que estão sendo transmitidos podem não ter chegado ainda ao ponto onde o nó escuta, então ele pensa que está vazio começa a transmitir e então ocorre colisão. Pode ocorrer também de dois nós escutarem ao mesmo tempo. (Lembrar do diagrama espaço/tempo)
+-> O atraso de propagação fim-a-fim do canal é de extrema importância para a eficiência da escuta a portadora. Quanto maior o comprimento do canal maior a chance de uma transmissão não ser detectada pela escuta.
+-> Para protocolos CSMA sem detecção de colisão os quadros são transmitidos integralmente mesmo quando ocorre colisão.
+-> Para protocolos CSMA com detecção de colisão existe um pequeno intervalo de tempo entre a detecção de colisão e o abortamento.
+
+Obs: CSMA/CD -> CSMA com detecção de colisão.
+
+
+
+
+
+-=-=-= Protocolos de Revesamento =-=-=-
+
+-> Como dito anteriormente um protocolo de enlace ideal permite que quando apenas um nó está ativo o mesmo possa usufruir de toda a banda do canal, e que quando M nós estão ativos cada terá vazão média de R/M bps. O segundo caso não ocorre em Protocolos como Aloha e CSMA enquanto que o primeiro não ocorre em protocolos como TDM(A) e FDM(A).
+
+
+-> Protocolo de Seleção ou Polling => É um protocolo de revesamento que requer um nó mestre, que controlará o quanto e quando cada um dos outros nós deve enviar (o nó mestre também regula a sí próprio). A escolha é feita de maneira cíclica. O nó mestre determina uma quantidade de quadros que o nó 1 pode enviar quando o nó 1 acaba ele determina o quanto o nó 2 deve enviar e assim sucessivamente até chegar sua vez quando ele checa que o canal está ocioso e então envia. O nó mestre entende que um nó acabou de enviar quando percebe ausência de sinal no canal. Nesse protocolo não ocorre colisões nem intervalos vazios, porém ele possui um certo atraso de seleção visto que o nó mestre deve selecionar detre os outros quem deve transmitir. Se existir apenas um nó transmitindo devido a checagem dos nós ociosos o nó ativo perderá uma certa quantidade de tempo que poderia estar transmitindo logo a taxa de transferência fica um pouco inferior a Rbps. Outra grande desvantagem é que se o nó mestre for derrubado a rede toda cai.
+
+
+-> Protocolo de Passagem de Permissão => são protocolos de revesamento que não utilizam nó mestre, na realidade eles utilizam um quadro de propósito especial um quadro de permissão (Token) cada nó passa o token para outro nó seguindo uma ordem. Se o nó tiver algo a transmitir transmite um número máximo de quadros e então envia o token para o próximo, caso contrário ele apenas repassa o token. Esse protocolo chega a ser bastante eficiente porém quando um único nó está transmitindo existe um certo delay de passagem de token que atrasa um certo tempo o nó fazendo com que sua velocidade média seja um pouco menor que Rbps. Outro problema é que basta um nó cair que toda a rede é derrubada, além do que se por um acaso ocorrer um problema e um nó "prender" o token deve-se recorrer a medidas de emergência.
+
+
+
+-=-=-= Redes Locais (LANs) =-=-=-
+
+
+LANS token rings -> São redes em forma de anel que utilizam o protocolo de passagem de permissão. O nó que envia o quadro é quem tem a responsabilidade de removê-lo do canal.
+FDDI -> Uma LAN projetada para grandes areas geográficas onde um quadro não precisa passar por todos os nós. O nó o qual deve receber o quadro recebe e retira o quadro do canal , portando FDDI não é um canal de broadcast puro visto que o quadro não passa por todos os nós. 
+
+ 
+
+-=-=-=-=-=-=-= Endereçamento na camada de Enlace =-=-=-=-=-=-=-
+
+
+-=-= Endereços MAC =-=-
+
+-> Não é o Nó que possui um endereço da camada de enlace, mas sim o Adaptador do nó.
+-> Endereços da camada de Enlace são chamados Endereços de Lan, Endereços físicos ou Endereços MAC.
+-> Endereços MAC tem 6 bytes e são representados em Hexadecimal.
+-> Endereços MAC são fixos, quando um adaptador é fabricado seu endereço MAC é gravado na ROM do adaptador. (Estrutura linear)
+-> Empresas fabricantes de adaptadores compram "lotes" de endereçamento MAC do IEEE.
+-> Um adaptador recebe um quadro e checa se no quadro o endereço MAC de destino Bate com seu próprio endereço. Se bater o adaptador extrai o datagrama de rede e o envia para o nó pai. Caso contrário o adaptador descarta o quadro.
+-> Quando um Adaptador quer que todos os outros adaptadores do canal recebam o quadro ele envia o endereço destino como endereço de BroadCast (todos os bits dos 6 bytes iguais a 1). FF-FF-FF-FF-FF-FF.
+
+
+-=-= ARP - Protocolo de resolução de endereços =-=-
+
+-> Necessitamos Traduzir endereços de Rede IP em endereços físicos MAC.
+-> Análogo ao DNS.
+-> Modulos ARP nos nós -> Modulos ARP tomam qualquer endereço IP de uma mesma SUBREDE e retornam o endereço MAC de cada endereço IP.
+-> Cada nó possui em sua RAM uma tabela ARP que possui registros de endereços IP em endereços MAC, além de um campo de TTL para determinar quando cada mapeamento será apagado da tabela. A tabela pode conter endereços expirados e desatualizados. A tabela ARP não contém necessáriamente todos os endereços da sub-rede.
+-> Quando um endereço IP não está mapeado na tabela ARP de um nó, o nó envia um pacote ARP de consulta ao adaptador e o adaptador envia o pacote ARP (ARP QUERY)de consulta para toda a subrede (com endereço MAC de broadcast). O nó que possui o endereço IP que está contido no pacote ARP envia para o nó que perguntou seu endereço MAC. O nó que perguntou então pode atualizar a sua tabela ARP e enviar quadros para quem queria (Final Feliz. ¬¬).
+-> O ARP é plug-and-play não precisa de administrador.
+-> ARP é um protocolo entre a camada de enlace e a de rede.
+
+
+
+-=-= Envio de um datagrama para um nó que está fora da subrede =-=-
+
+-> Como um nó faz para enviar quadros para fora da subrede?
+-> primeiramente obtém através de ARP o endereço do roteador de saída, e envia um pacote com IP destino desejado. o quadro chega no roteador o roteador desencapsula e olha o endereço IP a partir daí o roteador faz os mesmos passos que o host inicial fez até encontrar o endereço MAC do host de destino ou de roteadores que levem a esse endereço.
+
+
+
+
+-=-=-=-=-=-=-= ETHERNET =-=-=-=-=-=-=-
+
+-> Primeira LAN de Alta velocidade amplamente disseminada.
+-> Simples, Rápida e Barata.
+
+-=-= Estrutura do Quadro Ethernet =-=-
+
+_____________________________________________________________________________
+| Preâmbulo | Endereço de Destino | Endereço da origem | Tipo | Dados | CRC |
+_____________________________________________________________________________
+
+Dados -> Carrega o Datagrama IP. Ethernet possui MTU de 1.500bytes sendo que se um datagrama IP tiver mais que 1.500bytes terá que ser fragmentado. O tamanho mínimo é 46bytes se um datagrama IP tiver menos de 46bytes terá que ser recheado com algo até completar o tamaho (stuffing). A camada de rede usa o campo de tamanho de cabeçalho para remover o recheio.
+
+Endereço de Destino -> Endereço MAC do adaptador de destino. Um adaptador recebe e desencapsula um quadro se o campo de endereço destino bate com o seu endereço ou com o endereço de broadcast.
+
+Endereço da fonte -> Endereço MAC do adaptador que transmite o quadro para a LAN.
+
+Tipo -> Permite que o quadro ethernet multiplexe protocolos de camada de rede. Como o IP não é o único protocolo o Ethernet pode rodar sob camadas de rede que possuem protocolos diferentes(O protocolo ARP tem um número de identificação tbm!). É necessário identificar o protocolo de rede para poder Demultiplexar os dados para a camada de rede correta.
+
+CRC -> Verificação cíclica para detecção de erros. (O CRC é calculado usando todos os campos EXCETO o preâmbulo).
+
+Preâmbulo -> 7 bytes com 10101010 + 1 byte no final com 10101011. Serve para que adaptadores receptores sincronizem seus relógios com o do remetente. Existe uma pequena variação de velocidade entre o que o remetente deseja conseguir enviar e o que ele realmente envia esse campo ajuda a descobrir que variação é essa fazendo uma sincronia. O ultimo byte serve para que o adaptador saiba que acabou o preâmbulo e agora começa o resto do quadro.
+
+
+-> Não Confiável/Não Orientado a Conexão -> relativo a camada enlace. Não se conecta a outros adaptadores nem retransmite nem reconhece.
+
+ -=-= CSMA/CD =-=-
+
+-> Ethernet da suporte a broadcast então deve usar um protocolo de acesso múltiplo.
+-> Adaptadores Ethernet são capazes de saber se está ocorrendo transmissão de dados no canal e parar de transmitir caso detectem colisão.
+
+=> O adaptador Recebe o Datagrama de seu nó Pai e encapsula em um quadro.
+=> Escuta o canal durante 96 tempos de bit para ver se não há ninguém transmitindo.
+=> se o canal estiver ocupado, o adaptador espera 96 tempos de bits e checa novamente até encontrar o canal ocioso.
+=> se o canal estiver ocioso começa a transmitir e fica detectando colisões.
+=> caso não ocorra colisão o trabalho está completo.
+=> caso ocorra colisão pára imediatamente de transmitir e envia um sinal de reforço de colisão de 48 bits. (Pode ser que tenha transmitido muito pouco e um dos 2 adaptadores não estão cientes da colisão)
+=> entra em backoff exponencial. Após a n-ésima detecção de colisão o adaptador escolhe aleatóriamente um K entre 0 e [(2^m) - 1] onde  m = minimo(n,10).
+=> espera K*512 tempos de bits e então volta a retransmitir.
+
+=> quando os tempos de propagação ou transmissão tendem a 0 a eficiencia da ethernet tende a 100%
+
+
+<importante>
+-> quanto a parte de GbitEthernet e tipos é melhor olhar no slide para dar um refresh.
+</importante>
+
+
+
+-=-=-=-=-=-=-= HUBS E COMUTADORES =-=-=-=-=-=-=-
+
+-=-= Hubs =-=-
+
+-> Hub é apenas um repetidor de bits.
+-> Atua apenas na camada física.
+-> O modo mais simples de ligar LANS.
+-> Projeto de Hub Multinível -> varios níveis de Hubs ligando sub-redes diferentes. Ex : um hub que conecta o grad-0 ligado a um hub que conecta o CIn que por sua vez está ligado a um hub Que conecta a federal e assim sucessivamente.
+-> Hub de backbone hub que conecta lans de um mesmo nível.
+-> Quando usamos Hubs de backbone o domínio de colisão que antes era local atinge toda a rede. Vazão agregada permanece constante.
+-> Hubs não podem atuar em segmentos de LAN de velocidades diferentes.
+
+
+-=-= Comutadores de Camada de Enlace (Switches) =-=-
+
+-> são dispositivos Plug-and-Play
+-> Atua na camada de enlace (Camada 2).
+-> Utilizam CSMA/CD
+-> Repassam os quadros de acordo com o endereço da LAN de destino.
+-> Separando LANs com switches estamos isolando os domínios de colisão.
+-> Podemos utilizar Switches para conectar LANs que tenham velocidades diferentes.
+-> são full-duplex e fornecem comutação acelerada (cut-through switching )
+-> as LANs ficam sem restrição de tamanho.
+--> Switches tem a propriedade de Aprendizagem automática <--
+   - Quando a tabela de comutação está vazia, ou não se sabe o endereço do destino ele envia o quadro para todos os possiveis enlaces.
+   - Quando o endereço MAC da fonte não está na tabela ele registra na tabela o Endereço MAC da fonte e de qual enlace ele Veio (Assim como o horário também).
+   - Quando um quadro chega e o endereço de destino está na tabela repassa o quadro para a interface correspondente.
+   - Os Endereços não referentemente referenciados na tabela serão apagados após um certo tempo.
+
+-> Dizemos que um host tem acesso dedicado quando não compartilha o canal de acesso entre ele e o comutador. 
+
+--> Cut Through Switching <--
+
+- Muitos Comutadores utilizam comutação acelerada (Cut-through) em vez de Store-and-Foward
+- As duas técnicas só possuem uma diferença prática quando o buffer de saída está vazio.
+- se não há fila no buffer de saída o pacote começa a ser transmitido antes de chegar por completo (Logicamente o campo de endereço de destino deve chegar completamente).
+- O que acontece no Store-and-foward é um atraso de armazenagem.
+
+
+
+
+-= Repasse e Filtragem Por Comutadores =-
+
+Filtragem -> capacidade de determinar se um quadro deve ser repassado para alguma interface, ou apenas ser descartado.
+Repasse -> capacidade de determinar para que interface o quadro deve seguir.
+
+Filtragem e Repasse são feitos em comutadores com o auxílio de uma tabela de comutação ->  em uma tabela de comutação existe para um registro de nó que lá esteja um endereço MAC , o Endereço da interface na qual o quadro deve seguir para encontrar esse nó e o horário que esse registro foi adicionado na tabela.
+
+Quando um datagrama chega a um Switch ele checa o endereço da interface de destino a partir do MAC se o endereço da interface for igual ao endereço de onde o quadro veio então ele realiza filtragem, caso contrário ele faz o repasse para a interface de rede correta.
+
+
+
+OBS:
+
+-> lembrar que roteadores atuam na camada 3, enquanto que comutadores atuam na camada 2.
+
+
+
+
+   _________________________________
+  |:::::::::::::;;::::::::::::::::::|
+  |:::::::::::'~||~~~``:::::::::::::|
+  |::::::::'   .':     o`:::::::::::|
+  |:::::::' oo | |o  o    ::::::::::|
+  |::::::: 8  .'.'    8 o  :::::::::|
+  |::::::: 8  | |     8    :::::::::|
+  |::::::: _._| |_,...8    :::::::::|
+  |::::::'~--.   .--. `.   `::::::::|
+  |:::::'     =8     ~  \ o ::::::::|
+  |::::'       8._ 88.   \ o::::::::|
+  |:::'   __. ,.ooo~~.    \ o`::::::|
+  |:::   . -. 88`78o/:     \  `:::::|
+  |::'     /. o o \ ::      \88`::::|   
+  |:;     o|| 8 8 |d.        `8 `:::|
+  |:.       - ^ ^ -'           `-`::|
+  |::.                          .:::|
+  |:::::.....           ::'     ``::|
+  |::::::::-'`-        88          `|
+  |:::::-'.          -       ::     |
+  |:-~. . .                   :     |
+  | .. .   ..:   o:8      88o       |
+  |. .     :::   8:P     d888. . .  |
+  |.   .   :88   88      888'  . .  |
+  |   o8  d88P . 88   ' d88P   ..   |
+  |  88P  888   d8P   ' 888         |
+  |   8  d88P.'d:8  .- dP~ o8       |   
+  |      888   888    d~ o888    LS |
+  |________________________________
+
+
+
+
+
+
+
+
+
+
+
